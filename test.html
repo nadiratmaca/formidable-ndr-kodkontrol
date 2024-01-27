@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input id="field_kampanya_kod" >
+
+    <script>
+        document.getElementById("field_kampanya_kod").onkeyup = function(e) {ndr_uppercase(e.target)};
+        document.getElementById("field_kampanya_kod").onkeydown = function(e) {ndr_uppercase(e.target)};
+        function ndr_uppercase(target) {
+            console.log(target);
+
+          let x = document.getElementById("field_kampanya_kod");
+         // x.value = x.value.toUpperCase();
+          target.value = target.value.toLocaleUpperCase();
+        }
+        
+        
+            </script>
+
+</body>
+</html>
