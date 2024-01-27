@@ -28,7 +28,7 @@ function ndr_tcl_kod_pre_valid($fld_kod)
     $pattern = '/^[A-Z0-9]{12}$/';  
     return trim($fld_kod) == "" ? false : preg_match($pattern, $fld_kod);
  }
-}
+} 
 
 /****************************************************************************************** */
 
