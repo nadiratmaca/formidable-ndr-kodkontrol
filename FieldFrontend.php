@@ -22,13 +22,17 @@ function ndr_formidable_tcl_kod_validator($errors, $field, $value)
 
         $fld_kod = trim($_POST['item_meta'][$field->field_options['fld_kod']]);
 
-        if (!ndr_formidable_tcl_servis_sorgula($fld_kod)) {
+
+
+        if (ndr_formidable_tcl_servis_sorgula($fld_kod)!= 200) {
             $errors['field' . $field->id] = $field->field_options['error_kodkontrol'];
-            }
+            } 
+
+
         }
 
 
-//var_dump($errors);
+    //trace($errors);
 
     return $errors;
     }
@@ -39,18 +43,17 @@ Local Servis validasyon
 
 function ndr_formidable_tcl_servis_sorgula($kod)
     {
-
-       // echo "function : ndr_formidable_tcl_servis_sorgula";
+    $response = false;
+    // echo "function : ndr_formidable_tcl_servis_sorgula";
     $fld_kod = trim($kod);
 
     if (ndr_tcl_kod_pre_valid($fld_kod) == false) {
         return false;
         }
 
-    if ($cacheData = ndr_TclCacheControl($fld_kod)) {
-        $response = json_decode($cacheData, true);
-    
-    } else {
+    if ($request = ndr_TclCacheControl($fld_kod)) {
+        $response = $request;
+        } else {
 
         $fld_kod  = $fld_kod != "" ? $fld_kod : "TestKD";
         $endpoint = get_rest_url(null, 'tcl/v1/kod_kontrol/');
@@ -61,18 +64,25 @@ function ndr_formidable_tcl_servis_sorgula($kod)
         );
         $request  = wp_remote_get($url, $args);
 
+      
+
         if (is_wp_error($request)) {
             return false;
             }
-        $response = json_decode(wp_remote_retrieve_body($request), true);
 
+ 
+        $response=$request['body'];  
+        $response=json_decode($response,true); 
         ndr_TclCacheControl($fld_kod, $response);
-    }
+        }
 
-    //var_dump($request);
+        $response = gettype()
 
-    
-     return $response["status"] == 200 ? true : false;
+   return $response['status'] == 200 ? true : $response['data']['HttpStatusCode'];
+      
+
+        
+
 
 
 
