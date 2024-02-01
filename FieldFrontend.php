@@ -4,10 +4,10 @@
 defined('ABSPATH') or die('Bu dosya doğrudan çağırılarak çalışmaz.');
 
 
-
 add_filter('frm_validate_field_entry', 'ndr_formidable_tcl_kod_validator', 10, 3);
 function ndr_formidable_tcl_kod_validator($errors, $field, $value)
     {
+
 
     if ($field->type == 'type_kodkontrol') {
         /********
@@ -21,11 +21,11 @@ function ndr_formidable_tcl_kod_validator($errors, $field, $value)
         /********** */
 
         $fld_kod = trim($_POST['item_meta'][$field->field_options['fld_kod']]);
-
-
-
+       
+        //var_dump(ndr_formidable_tcl_servis_sorgula($fld_kod));
         if (ndr_formidable_tcl_servis_sorgula($fld_kod)!= 200) {
-            $errors['field' . $field->id] = $field->field_options['error_kodkontrol'];
+               $errors['field' . $field->id] = $field->field_options['error_kodkontrol'];               
+            
             } 
 
 
@@ -51,9 +51,9 @@ function ndr_formidable_tcl_servis_sorgula($kod)
         return false;
         }
 
-    if ($request = ndr_TclCacheControl($fld_kod)) {
-        $response = $request;
-        } else {
+    // if ($request = ndr_TclCacheControl($fld_kod)) {
+    //     $response = $request;
+    //     } else {
 
         $fld_kod  = $fld_kod != "" ? $fld_kod : "TestKD";
         $endpoint = get_rest_url(null, 'tcl/v1/kod_kontrol/');
@@ -73,18 +73,15 @@ function ndr_formidable_tcl_servis_sorgula($kod)
  
         $response=$request['body'];  
         $response=json_decode($response,true); 
-        ndr_TclCacheControl($fld_kod, $response);
-        }
 
-        $response = gettype()
+      //  var_dump($request);
+        // ndr_TclCacheControl($fld_kod, $response);
+        // }
 
-   return $response['status'] == 200 ? true : $response['data']['HttpStatusCode'];
-      
+ 
 
-        
-
-
-
+   return $response['status'] == 200 ? true : false;
+         
 
     }
 

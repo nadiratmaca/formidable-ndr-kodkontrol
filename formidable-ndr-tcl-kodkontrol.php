@@ -13,6 +13,15 @@
  */
 /*
 
+
+1 // Code not presented
+2 // Code not correct
+3 // Unable to activate
+4 // Already activated
+5 // Code activated
+
+
+
 5WPS4MDEYCHG
 3F49GZTK7AUL
 CSZJYI1F9LOH
@@ -42,28 +51,38 @@ D248HRVTSPB3
 
 
 defined('ABSPATH') or die('Bu dosya doğrudan  çalışmaz.');
+function ndr_include($filePath=false){
 
+  // $filePath=dirname( dirname( __FILE__ ) ) .'/'. $filePath;
+  // echo $filePath;
+//  if (file_exists($filePath)){
+     
+//   }  
+ include_once($filePath);
+}
 /*
 ^([A-Z0-9]{12}+)$
 
 */
+
+
+
 if (!defined('_NDR_TCL')) {
     defined('_NDR_TCL') or define('_NDR_TCL', TRUE);
 
-    include('functions.php');
-    include('service.php');
+    ndr_include('functions.php');
+    ndr_include('service.php');
 
 
 
     add_action( 'admin_init', function (){
-      include('FieldBackend.php');
-    });
+      ndr_include('FieldBackend.php');                  
+      ndr_include('FormAction.php');
+      
+    },99);
 
-    if(!is_admin()){ 
-         add_action( 'init', function (){      
-             include('FieldFrontend.php');
-        }); 
-    }
+    ndr_include('FieldFrontend.php');
+
     
 
 

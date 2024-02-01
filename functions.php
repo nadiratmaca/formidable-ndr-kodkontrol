@@ -65,17 +65,23 @@ if (!function_exists("ndr_send_mail")) {
 
 /****************************************************************************************** */
 
+
+
+
 if (!function_exists("ndr_TclCacheControl")) {
 
-    function ndr_TclCacheControl($kod, $cacheData = false)
+    function ndr_TclCacheControl($kod, $cacheData = "nocache")
         {
 
 
-        $expiration_time = 10; // (60*60)*4;
+        $cache_expiration_time =10; // (60*60)*4;
 
-        if (trim($kod) == "")
-            // @unlink($cacheFile);
+         
+        if (trim($kod) == "" || $cache_expiration_time == 0){
+             @unlink($cacheFile);
             return false;
+        }
+           
 
         $cacheDir  = WP_CONTENT_DIR . '/cache_tcl/';
         $cacheFile = $cacheDir . $kod . ".cache";
@@ -83,31 +89,38 @@ if (!function_exists("ndr_TclCacheControl")) {
             mkdir($cacheDir);
 
         if (isset($_REQUEST["cache"]) && $_REQUEST["cache"] == "purge" && file_exists($cacheFile)) {
-            // @unlink($cacheFile);
-            //$expiration_time = 0;
+             @unlink($cacheFile);
+            //$cache_expiration_time = 0;
 
             }
 
-        if ($cacheData != false) {
-            //echo "Cache Write<br>";
-            //var_dump($cacheData);
-            $cahe_info = array("timestamp" => time(), 'date' => date('Y-m-d H:i:s'));
+        if ($cacheData =="nocache") {            
+                  
+            $cahe_info = array(
+                "timestamp" => time(), 
+                "timeout" => $cache_expiration_time, 
+                'date' => date('Y-m-d H:i:s'),
+                'data' => $cacheData,
+            );
+            
             $data_type = gettype($cacheData);
 
             switch ($data_type) {
                 case 'array':                 
-                    $cacheData= json_encode($cacheData["cache_info"] = $cahe_info);
+                    $cahe_info['data'] = json_encode($cacheData);   
                     break;
                 case 'object':
-                    $cacheData= json_encode($cacheData->cache_info = $cahe_info);
+                    $cahe_info['data'] = json_encode($cacheData);                   
                     break;
                 case 'string':
-                    $cacheData .= PHP_EOL . implode(",", $cahe_info);
+                    $cahe_info['data'] = $cacheData;
                     break;
                 }
+
+              
                 
                 if($cacheData){
-                    return !file_put_contents($cacheFile, $cacheData);
+                    return !file_put_contents($cacheFile, json_encode($cahe_info));
                 }else{
                     return @unlink($cacheFile);
                 }
@@ -115,7 +128,7 @@ if (!function_exists("ndr_TclCacheControl")) {
             }
 
 
-        if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $expiration_time)) {
+        if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cache_expiration_time)) {
             // Önbellekteki veriyi oku ve geri döndür
             //echo "Cache DATA<br>";
             return json_decode(file_get_contents($cacheFile));
@@ -131,17 +144,23 @@ if (!function_exists("ndr_TclCacheControl")) {
 
 
 
-/*
-$kod=2;
+
+
+
+    /*
+
+
+
+    $kod=2;
 $data=false;
 //$data=time();
 
-if(!$data=ndr_TclCacheControl("TESTKOD".$kod)){
+if(!$data=ndr_TclCacheControl_old("TESTKOD".$kod)){
 echo "sleep";
 sleep(2);
 
 $data=time();
-var_dump(ndr_TclCacheControl("TESTKOD".$kod,$data));
+var_dump(ndr_TclCacheControl_old("TESTKOD".$kod,$data));
 }else{
 echo $data;
 
